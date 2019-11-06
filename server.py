@@ -1,7 +1,7 @@
-import numpy.matlib
-import time
+import numpy as np
 import Pyro4
 import sys
+import time
 
 
 @Pyro4.expose
@@ -19,40 +19,26 @@ class MatrixProcessing:
 
         self.matrix_b = new_matrix_b
 
-    def get_matrix_a(self):
-        return self.matrix_a
-
-    def get_matrix_b(self):
-        return self.matrix_b
-
-    def print_matrix(self):
-        print(self.matrix)
-
-    def get_c_matrix(self):
+    def get_matrix_c(self):
         return self.matrix
 
-    def clear_c_matrix(self):
+    def clear_matrix_c(self):
         self.matrix = None
 
     def multiply(self):
         if self.matrix is None:
-            self.matrix = numpy.dot(self.matrix_a, self.matrix_b)
+            self.matrix = np.dot(self.matrix_a, self.matrix_b)
         else:
-            self.matrix = self.matrix + numpy.dot(self.matrix_a, self.matrix_b)
-        print(self.matrix)
+            self.matrix = self.matrix + np.dot(self.matrix_a, self.matrix_b)
 
 
 if __name__ == "__main__":
-    # Pyro4.config.SERIALIZERS_ACCEPTED = "pickle"
     Pyro4.config.SERIALIZER = "pickle"
     port_id = int(sys.argv[1])
     matrix = MatrixProcessing()
     print("System started at port " + str(port_id) + "!")
     Pyro4.Daemon.serveSimple(
-        {matrix: "matrix"},
-        # host = sys.argv[1],
-        port=port_id,
-        ns=False,
+        {matrix: "matrix"}, port=port_id, ns=False,
     )
     while 1:
         time.sleep(0.1)
