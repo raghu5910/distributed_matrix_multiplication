@@ -124,10 +124,43 @@ class ClientClass:
         matrices = (matrix_A, matrix_B)
         return matrices
 
-    def start(self, matrix_size, num_processes, generate_to):
+    def start(self, matrix_size, num_processes, generate_to, remotes):
         self.block_size = int(math.sqrt(num_processes))
-        matrix_A, matrix_B = self.matrix_generation(matrix_size, generate_to)
-        pass
+        matrices = self.matrix_generation(matrix_size, generate_to)
+        t = 0
+        remote_num = 0
+        while t != self.block_size:
+            if t == 0:
+                matrix_A, matrix_B = self.skew_matrix(matrices)
+            else:
+                matrix_A, matrix_B = self.circular_shift(matrices)
+            for i in range(0, self.block_size):
+                for j in range(0, self.block_size):
+                    remotes[remote_num].set_matrix_a(
+                        matrix_A[
+                            i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                        ]
+                    )
+                    remotes[remote_num].set_matrix_b(
+                        matrix_B[
+                            i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                        ]
+                    )
+                    remotes[remote_num].multiply()
+                    remote_num = remote_num + 1
+            t = t + 1
+        matrix = np.zeros(shape=(array_size, array_size))
+        remote_num = 0
+        for i in range(0, self.block_size):
+            for j in range(0, self.block_size):
+                matrix[
+                    i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                ] = remotes[remote_num].get_c_matrix()
+                remote_num = remote_num + 1
+
+        print(matrix)
+
+        return matrix
 
     def matrix_generation(self, matrix_size, generate_to):
         """Generating random matrices of size (matrix_size, matrix_size)"""
