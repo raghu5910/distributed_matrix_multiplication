@@ -4,6 +4,7 @@ import Pyro4
 import sys
 
 
+@Pyro4.expose
 class MatrixProcessing:
     def __init__(self):
         self.matrix = None
@@ -35,12 +36,14 @@ class MatrixProcessing:
 
     def multiply(self):
         if self.matrix is None:
-            self.matrix = numpy.matlib.dot(self.matrix_a, self.matrix_b)
+            self.matrix = numpy.dot(self.matrix_a, self.matrix_b)
         else:
-            self.matrix = self.matrix + numpy.matlib.dot(self.matrix_a, self.matrix_b)
+            self.matrix = self.matrix + numpy.dot(self.matrix_a, self.matrix_b)
+        print(self.matrix)
 
 
 if __name__ == "__main__":
+    # Pyro4.config.SERIALIZERS_ACCEPTED = "pickle"
     Pyro4.config.SERIALIZER = "pickle"
     port_id = int(sys.argv[1])
     matrix = MatrixProcessing()

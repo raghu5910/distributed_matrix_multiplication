@@ -23,25 +23,26 @@ class ClientClass:
             for arr in element:
                 if temp is None:
                     temp = arr.get_c_matrix()
+                    print(temp)
                 else:
                     matrix = arr.get_c_matrix()
                     temp = numpy.append(temp, matrix, axis=1)
             result.append(temp)
-        result = numpy.append(*result, axis=0)
-        print(result)
+        # result = numpy.append(*result, axis=0)
+        print(temp)
 
     def run(self, machine_number, generator_from, generator_to):
         self.servers = [
-            "PYRO:matrix@127.0.0.1:",
+            "PYRO:matrix@localhost:",
             # "PYRO:matrix@someotherserver.org:",
         ]
         machine_number = int(machine_number)
         self.block_size = int(array_size / machine_number)
         self.block_count = int(array_size / self.block_size)
-        numpy.set_printoptions(threshold=numpy.nan)
+        # numpy.set_printoptions(threshold=numpy.nan)
         matrices = self.generate_matrices(array_size, generator_from, generator_to)
         matrices = (self.split_matrix(matrices[0]), self.split_matrix(matrices[1]))
-        Pyro4.config.SERIALIZER = "pickle"
+        # Pyro4.config.SERIALIZER = "pickle"
         self.cannons_algorithm(matrices)
         self.get_result_matrix()
         print("--- %s seconds ---" % (time.time() - start_time))
@@ -71,11 +72,11 @@ class ClientClass:
         return matrix_a, matrix_b
 
     @staticmethod
-    def generate_matrix(n, k):
+    def generate_matrix(array_size, generate_from, generator_to):
         result = ""
-        for x in range(0, n):
-            for y in range(0, n):
-                result += str(random.randint(0, k)) + ","
+        for _ in range(0, array_size):
+            for _ in range(0, array_size):
+                result += str(random.randint(0, generator_to)) + ","
             result = result[:-1] + ";"
         return result[:-1]
 
@@ -83,12 +84,13 @@ class ClientClass:
         self.array = []
         self.set_initial_matrices(matrices)
         self.skew(self.block_count)
-        for i in range(0, self.machine_number):
+        for _ in range(0, self.machine_number):
             for element in self.array:
                 for value in element:
                     value.multiply()
+                    print(value.get_c_matrix())
             self.shift_a_matrix_left()
-            self.shift_b_matrix_up(self.block_size, self.block_count)
+            self.shift_b_matrix_up(self.block_count)
 
     def set_initial_matrices(self, matrices):
         for x in range(0, self.block_count):
@@ -99,11 +101,15 @@ class ClientClass:
                 matrix.clear_c_matrix()
                 matrix.set_matrix_a(matrices[0][x][y])
                 matrix.set_matrix_b(matrices[1][x][y])
+                # print(matrix.get_matrix_a())
+                # matrix.multiply()
+                # print(matrix.get_c_matrix())
                 temp_array.append(matrix)
                 self.machine_count += 1
                 if self.machine_count % 2 == 0:
                     self.port_number += 1
             self.array.append(temp_array)
+            # print(self.array)
 
     def skew(self, vector_length):
         for i in range(1, vector_length):
@@ -137,6 +143,7 @@ class ClientClass:
 
 
 if __name__ == "__main__":
+    Pyro4.config.SERIALIZER = "pickle"
     start_time = time.time()
     machineNumber = float(sys.argv[1])
     machineNumber = math.sqrt(machineNumber)
