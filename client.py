@@ -71,6 +71,58 @@ class ClientClass:
         )
         return matrix_a, matrix_b
 
+    def skew_matrix(self, matrices):
+        matrix_A, matrix_B = matrices
+        matrix_A_copy = matrix_A.copy()
+        matrix_B_copy = matrix_B.copy()
+        for i in range(0, self.block_size):
+            for j in range(0, self.block_size):
+                matrix_A[
+                    i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                ] = matrix_A_copy[
+                    i : (i + 1) * self.block_size,
+                    (j + i)
+                    % self.block_size : ((j + i) % self.block_size + 1)
+                    * self.block_size,
+                ]
+
+                matrix_B[
+                    i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                ] = matrix_B_copy[
+                    (i + j)
+                    % self.block_size : ((i + j) % self.block_size + 1)
+                    * self.block_size,
+                    j : (j + 1) * self.block_size,
+                ]
+        matrices = (matrix_A, matrix_B)
+        return matrices
+
+    def circular_shift(self, matrices):
+        matrix_A, matrix_B = matrices
+        matrix_A_copy = matrix_A.copy()
+        matrix_B_copy = matrix_B.copy()
+        for i in range(0, self.block_size):
+            for j in range(0, self.block_size):
+                matrix_A[
+                    i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                ] = matrix_A_copy[
+                    i : (i + 1) * self.block_size,
+                    (j + 1)
+                    % self.block_size : ((j + 1) % self.block_size + 1)
+                    * self.block_size,
+                ]
+
+                matrix_B[
+                    i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                ] = matrix_B_copy[
+                    (i + 1)
+                    % self.block_size : ((i + 1) % self.block_size + 1)
+                    * self.block_size,
+                    j : (j + 1) * self.block_size,
+                ]
+        matrices = (matrix_A, matrix_B)
+        return matrices
+
     @staticmethod
     def generate_matrix(array_size, generate_from, generator_to):
         result = ""
