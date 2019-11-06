@@ -28,7 +28,7 @@ class ClientClass:
         matrices = (matrix_A, matrix_B)
         return matrices
 
-    def skew_matrix(self, matrices):
+    def skew_shift(self, matrices):
         matrix_A, matrix_B = matrices
         matrix_A_copy = matrix_A.copy()
         matrix_B_copy = matrix_B.copy()
@@ -87,7 +87,7 @@ class ClientClass:
         remote_num = 0
         while t != self.block_size:
             if t == 0:
-                matrix_A, matrix_B = self.skew_matrix(matrices)
+                matrix_A, matrix_B = self.skew_shift(matrices)
             else:
                 matrix_A, matrix_B = self.circular_shift(matrices)
             for i in range(0, self.block_size):
