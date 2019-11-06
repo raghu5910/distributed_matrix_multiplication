@@ -4,6 +4,7 @@ import sys
 import time
 import math
 import Pyro4
+import numpy as np
 
 
 class ClientClass:
@@ -120,6 +121,18 @@ class ClientClass:
                     * self.block_size,
                     j : (j + 1) * self.block_size,
                 ]
+        matrices = (matrix_A, matrix_B)
+        return matrices
+
+    def start(self, matrix_size, num_processes, generate_to):
+        self.block_size = int(math.sqrt(num_processes))
+        matrix_A, matrix_B = self.matrix_generation(matrix_size, generate_to)
+        pass
+
+    def matrix_generation(self, matrix_size, generate_to):
+        """Generating random matrices of size (matrix_size, matrix_size)"""
+        matrix_A = np.random.randint(generate_to, size=(matrix_size, matrix_size))
+        matrix_B = np.random.randint(generate_to, size=(matrix_size, matrix_size))
         matrices = (matrix_A, matrix_B)
         return matrices
 
