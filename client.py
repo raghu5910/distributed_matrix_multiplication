@@ -117,6 +117,7 @@ class ClientClass:
                 matrix[
                     i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
                 ] = remotes[remote_num].get_matrix_c()
+                remotes[remote_num].clear_matrix_c()
                 remote_num = remote_num + 1
 
         print(matrix)
