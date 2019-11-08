@@ -1,5 +1,3 @@
-import numpy.matlib
-import random
 import sys
 import time
 import math
@@ -12,6 +10,7 @@ class ClientClass:
         self.block_size = None
         self.port_number = port_number
         self.block_size = None
+        self.num_processes = None
 
     def create_remote_objects(self, remote_urls):
         remotes = []
@@ -32,8 +31,13 @@ class ClientClass:
         matrix_A, matrix_B = matrices
         matrix_A_copy = matrix_A.copy()
         matrix_B_copy = matrix_B.copy()
-        for i in range(0, self.block_size):
-            for j in range(0, self.block_size):
+        for i in range(0, self.num_processes):
+            for j in range(0, self.num_processes):
+                print(
+                    matrix_A_copy[
+                        i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
+                    ].shape
+                )
                 matrix_A[
                     i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
                 ] = matrix_A_copy[
@@ -58,8 +62,8 @@ class ClientClass:
         matrix_A, matrix_B = matrices
         matrix_A_copy = matrix_A.copy()
         matrix_B_copy = matrix_B.copy()
-        for i in range(0, self.block_size):
-            for j in range(0, self.block_size):
+        for i in range(0, self.num_processes):
+            for j in range(0, self.num_processes):
                 matrix_A[
                     i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
                 ] = matrix_A_copy[
@@ -81,17 +85,18 @@ class ClientClass:
         return matrices
 
     def start(self, matrix_size, num_processes, generate_to, remotes):
-        self.block_size = int(math.sqrt(num_processes))
+        self.block_size = int(matrix_size / int(math.sqrt(num_processes)))
+        self.num_processes = int(num_processes)
         matrices = self.matrix_generation(matrix_size, generate_to)
         t = 0
         remote_num = 0
-        while t != self.block_size:
+        while t != int(math.sqrt(self.num_processes)):
             if t == 0:
                 matrix_A, matrix_B = self.skew_shift(matrices)
             else:
                 matrix_A, matrix_B = self.circular_shift(matrices)
-            for i in range(0, self.block_size):
-                for j in range(0, self.block_size):
+            for i in range(0, self.num_processes):
+                for j in range(0, self.num_processes):
                     remotes[remote_num].set_matrix_a(
                         matrix_A[
                             i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
@@ -107,8 +112,8 @@ class ClientClass:
             t = t + 1
         matrix = np.zeros(shape=(matrix_size, matrix_size))
         remote_num = 0
-        for i in range(0, self.block_size):
-            for j in range(0, self.block_size):
+        for i in range(0, self.num_processes):
+            for j in range(0, self.num_processes):
                 matrix[
                     i : (i + 1) * self.block_size, j : (j + 1) * self.block_size
                 ] = remotes[remote_num].get_matrix_c()

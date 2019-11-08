@@ -12,12 +12,12 @@ class MatrixProcessing:
         self.matrix_b = None
 
     def set_matrix_a(self, new_matrix_a):
-
         self.matrix_a = new_matrix_a
+        print(self.matrix_a)
 
     def set_matrix_b(self, new_matrix_b):
-
         self.matrix_b = new_matrix_b
+        print(self.matrix_b)
 
     def get_matrix_c(self):
         return self.matrix
@@ -30,6 +30,7 @@ class MatrixProcessing:
             self.matrix = np.dot(self.matrix_a, self.matrix_b)
         else:
             self.matrix = self.matrix + np.dot(self.matrix_a, self.matrix_b)
+        print(self.matrix)
 
 
 if __name__ == "__main__":
