@@ -131,7 +131,7 @@ if __name__ == "__main__":
     matrix_size = int(sys.argv[1])
     machineNumber = float(sys.argv[2])
     generate_to = int(sys.argv[3])
-    remote_urls = ["PYRO:matrix@localhost:"]
+    remote_urls = ["PYRO:matrix@192.168.43.179:"]
     if machineNumber.is_integer() and matrix_size % math.sqrt(machineNumber) == 0:
         client = ClientClass(9601)
         remotes = client.create_remote_objects(remote_urls)
