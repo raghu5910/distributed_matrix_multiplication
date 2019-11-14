@@ -2,6 +2,9 @@ import numpy as np
 import Pyro4
 import sys
 import time
+import os
+
+os.environ["PYRO_SERIALIZERS_ACCEPTED"] = "serpent,json,marshal,pickle,dill"
 
 
 @Pyro4.expose
@@ -39,7 +42,7 @@ if __name__ == "__main__":
     matrix = MatrixProcessing()
     print("System started at port " + str(port_id) + "!")
     Pyro4.Daemon.serveSimple(
-        {matrix: "matrix"}, host="192.168.43.179", port=port_id, ns=False,
+        {matrix: "matrix"}, host="192.168.9.154", port=port_id, ns=False,
     )
     while 1:
         time.sleep(0.1)

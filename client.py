@@ -24,6 +24,9 @@ class ClientClass:
         """Generating random matrices of size (matrix_size, matrix_size)"""
         matrix_A = np.random.randint(generate_to, size=(matrix_size, matrix_size))
         matrix_B = np.random.randint(generate_to, size=(matrix_size, matrix_size))
+        # print(matrix_A)
+        # print(matrix_B)
+        # print(np.matmul(matrix_A, matrix_B))
         matrices = (matrix_A, matrix_B)
         return matrices
 
@@ -131,7 +134,12 @@ if __name__ == "__main__":
     matrix_size = int(sys.argv[1])
     machineNumber = float(sys.argv[2])
     generate_to = int(sys.argv[3])
-    remote_urls = ["PYRO:matrix@192.168.43.179:"]
+    remote_urls = [
+        # "PYRO:matrix@192.168.11.40:",
+        "PYRO:matrix@192.168.9.98:",
+        # "PYRO:matrix@192.168.9.154:",
+        # "PYRO:matrix@192.168.9.208:",
+    ]
     if machineNumber.is_integer() and matrix_size % math.sqrt(machineNumber) == 0:
         client = ClientClass(9601)
         remotes = client.create_remote_objects(remote_urls)
