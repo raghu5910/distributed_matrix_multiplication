@@ -3,6 +3,7 @@ import time
 import math
 import Pyro4
 import numpy as np
+import argparse
 
 
 class ClientClass:
@@ -35,16 +36,9 @@ class ClientClass:
         matrix_A, matrix_B = matrices
         matrix_A_copy = matrix_A.copy()
         matrix_B_copy = matrix_B.copy()
-        for i in range(0, 2):
-            for j in range(0, 2):
-                print("{} {}".format(i, j))
-                print("matrix_A_copy shape")
-                print(
-                    matrix_A_copy[
-                        i * self.block_size : (i + 1) * self.block_size,
-                        j * self.block_size : (j + 1) * self.block_size,
-                    ].shape
-                )
+        for i in range(0, self.s):
+            for j in range(0, self.s):
+                print(f"{i} {j}")
                 matrix_A[
                     i * self.block_size : (i + 1) * self.block_size,
                     j * self.block_size : (j + 1) * self.block_size,
@@ -54,16 +48,6 @@ class ClientClass:
                     * self.block_size : ((j + i) % self.s + 1)
                     * self.block_size,
                 ]
-                print("matrix b copy shape")
-                print(
-                    matrix_B_copy[
-                        ((i + j) % self.s)
-                        * self.block_size : ((i + j) % self.s + 1)
-                        * self.block_size,
-                        j * self.block_size : (j + 1) * self.block_size,
-                    ].shape
-                )
-
                 matrix_B[
                     i * self.block_size : (i + 1) * self.block_size,
                     j * self.block_size : (j + 1) * self.block_size,
@@ -91,7 +75,6 @@ class ClientClass:
                     * self.block_size : ((j + 1) % self.s + 1)
                     * self.block_size,
                 ]
-
                 matrix_B[
                     i * self.block_size : (i + 1) * self.block_size,
                     j * self.block_size : (j + 1) * self.block_size,
@@ -148,30 +131,43 @@ class ClientClass:
 
 if __name__ == "__main__":
     Pyro4.config.SERIALIZER = "pickle"
-    # start_time = time.time()
-    matrix_size = int(sys.argv[1])
-    machineNumber = float(sys.argv[2])
-    generate_to = int(sys.argv[3])
+    parser = argparse.ArgumentParser(description="Distributed matrix multiplication")
+    parser.add_argument(
+        "--matrix_size", default=16, type=int, help="size of the matrix (nxn)"
+    )
+    parser.add_argument(
+        "--numMachines", default=1, type=int, help="number of available machines"
+    )
+    parser.add_argument(
+        "--generate_to",
+        default=8,
+        type=int,
+        help="upper bound for the values in the matrix",
+    )
+    args = parser.parse_args()
+    matrix_size = int(args.matrix_size)
+    machineNumber = int(args.numMachines)
+    generate_to = int(args.generate_to)
     remote_urls = [
-        # "PYRO:matrix@192.168.11.40:",
-        "PYRO:matrix@192.168.9.98:",
-        # "PYRO:matrix@192.168.9.154:",
+        "PYRO:matrix@192.168.43.216:",
+        # "PYRO:matrix@192.168.9.98:",
+        # "PYRO:matrix@192.168.9.154:",  # raghu
         # "PYRO:matrix@192.168.9.208:",
     ]
     client = ClientClass(9601)
-    client.num_processes = int(machineNumber)
-    client.block_size = int(matrix_size / int(math.sqrt(machineNumber)))
-    client.s = int(math.sqrt(machineNumber))
-    matrices = client.matrix_generation(matrix_size, generate_to)
-    print(matrices)
-    matrices = client.skew_shift(matrices)
-    matrices = client.circular_shift(matrices)
-    print(matrices)
+    # client.num_processes = int(machineNumber)
+    # client.block_size = int(matrix_size / int(math.sqrt(machineNumber)))
+    # client.s = int(math.sqrt(machineNumber))
+    # matrices = client.matrix_generation(matrix_size, generate_to)
+    # print(matrices)
+    # matrices = client.skew_shift(matrices)
+    # matrices = client.circular_shift(matrices)
+    # print(matrices)
 
-    # if machineNumber.is_integer() and matrix_size % math.sqrt(machineNumber) == 0:
-    #     client = ClientClass(9601)
-    #     remotes = client.create_remote_objects(remote_urls)
-    #     client.start(matrix_size, machineNumber, generate_to, remotes)
-    # else:
-    #     print("Square root of machines count must be an integer!")
+    if matrix_size % math.sqrt(machineNumber) == 0:
+        client = ClientClass(9601)
+        remotes = client.create_remote_objects(remote_urls)
+        client.start(matrix_size, machineNumber, generate_to, remotes)
+    else:
+        print("Square root of machines count must be an integer!")
 
