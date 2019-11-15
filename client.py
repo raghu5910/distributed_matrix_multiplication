@@ -149,9 +149,9 @@ if __name__ == "__main__":
     machineNumber = int(args.numMachines)
     generate_to = int(args.generate_to)
     remote_urls = [
-        "PYRO:matrix@192.168.43.216:",
+        "PYRO:matrix@10.100.11.10:",
         # "PYRO:matrix@192.168.9.98:",
-        # "PYRO:matrix@192.168.9.154:",  # raghu
+        # "PYRO:matrix@10.100.12.238:",  # raghu
         # "PYRO:matrix@192.168.9.208:",
     ]
     client = ClientClass(9601)
