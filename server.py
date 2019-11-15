@@ -42,7 +42,7 @@ if __name__ == "__main__":
     matrix = MatrixProcessing()
     print("System started at port " + str(port_id) + "!")
     Pyro4.Daemon.serveSimple(
-        {matrix: "matrix"}, host="192.168.9.154", port=port_id, ns=False,
+        {matrix: "matrix"}, host="10.100.12.238", port=port_id, ns=False,
     )
     while 1:
         time.sleep(0.1)

@@ -133,13 +133,14 @@ if __name__ == "__main__":
     Pyro4.config.SERIALIZER = "pickle"
     parser = argparse.ArgumentParser(description="Distributed matrix multiplication")
     parser.add_argument(
-        "--matrix_size", default=16, type=int, help="size of the matrix (nxn)"
+        "--matrix_size", "-n", default=16, type=int, help="size of the matrix (nxn)"
     )
     parser.add_argument(
-        "--numMachines", default=1, type=int, help="number of available machines"
+        "--numMachines", "-m", default=1, type=int, help="number of available machines"
     )
     parser.add_argument(
         "--generate_to",
+        "-u",
         default=8,
         type=int,
         help="upper bound for the values in the matrix",
@@ -149,9 +150,9 @@ if __name__ == "__main__":
     machineNumber = int(args.numMachines)
     generate_to = int(args.generate_to)
     remote_urls = [
-        "PYRO:matrix@10.100.11.10:",
+        # "PYRO:matrix@10.100.11.10:",
         # "PYRO:matrix@192.168.9.98:",
-        # "PYRO:matrix@10.100.12.238:",  # raghu
+        "PYRO:matrix@10.100.12.238:",  # raghu
         # "PYRO:matrix@192.168.9.208:",
     ]
     client = ClientClass(9601)
